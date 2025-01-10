@@ -32,9 +32,20 @@ def DrawBoard():
     #endregion Draw players camps
 
     #region Draw main locations
-    canvas.create_oval(locationSize * 0 + borderSize, locationSize * 6, locationSize * 0 + locationDisplaySize, locationSize * 6 + locationDisplaySize, fill="gray20", outline='gray35')
-    canvas.create_oval(locationSize * 1 + borderSize, locationSize * 6, locationSize * 1 + locationDisplaySize, locationSize * 6 + locationDisplaySize, fill="gray20", outline='gray35')
-    canvas.create_oval(locationSize * 2 +borderSize, locationSize * 6, locationSize * 2 + locationDisplaySize, locationSize * 6 + locationDisplaySize, fill="gray20", outline='gray35')
+    for i in range(15): 
+        if(i != 7):
+            canvas.create_oval(locationSize * i + borderSize, locationSize * 6 + borderSize, locationSize * i + locationDisplaySize, locationSize * 6 + locationDisplaySize, fill="gray20", outline='gray35')
+            canvas.create_oval(locationSize * i + borderSize, locationSize * 8 + borderSize, locationSize * i + locationDisplaySize, locationSize * 8 + locationDisplaySize, fill="gray20", outline='gray35')
+    
+    for i in range(15): 
+        if(i != 7):
+            canvas.create_oval(locationSize * 6 + borderSize, locationSize * i + borderSize, locationSize * 6 + locationDisplaySize, locationSize * i + locationDisplaySize, fill="gray20", outline='gray35')
+            canvas.create_oval(locationSize * 8 + borderSize, locationSize * i + borderSize, locationSize * 8 + locationDisplaySize, locationSize * i + locationDisplaySize, fill="gray20", outline='gray35')
+    
+    canvas.create_oval(locationSize * 0 + borderSize, locationSize * 7 + borderSize, locationSize * 0 + locationDisplaySize, locationSize * 7 + locationDisplaySize, fill="gray20", outline='gray35')
+    canvas.create_oval(locationSize * 7 + borderSize, locationSize * 14 + borderSize, locationSize * 7 + locationDisplaySize, locationSize * 14 + locationDisplaySize, fill="gray20", outline='gray35')
+    canvas.create_oval(locationSize * 7 + borderSize, locationSize * 0 + borderSize, locationSize * 7 + locationDisplaySize, locationSize * 0 + locationDisplaySize, fill="gray20", outline='gray35')
+    canvas.create_oval(locationSize * 14 + borderSize, locationSize * 7 + borderSize, locationSize * 14 + locationDisplaySize, locationSize * 7 + locationDisplaySize, fill="gray20", outline='gray35')
     #endregion Draw main locations
 
     # Update Canvas
