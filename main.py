@@ -40,10 +40,10 @@ def DrawBoard():
     Used to draw the board on the root windows inside a canvas
     """
     #region Draw players camps
-    canvas.create_rectangle(0, 0, locationSize*6 - borderSize, locationSize*6 - borderSize, fill=redLocationColors, outline=bgColorBis)
-    canvas.create_rectangle(0, size, locationSize*6 - borderSize, size + borderSize - locationSize*6, fill=blueLocationColors, outline=bgColorBis)
-    canvas.create_rectangle(size + borderSize - locationSize*6, 0, size, locationSize*6 - borderSize, fill=greenLocationColors, outline=bgColorBis)
-    canvas.create_rectangle(size + borderSize - locationSize*6, size + borderSize - locationSize*6, size, size, fill=yellowLocationColors, outline=bgColorBis)
+    canvas.create_rectangle(3, 3, locationSize*6, locationSize*6, fill=redLocationColors, outline=bgColorBis)
+    canvas.create_rectangle(3, size, locationSize*6, size - locationSize*6, fill=blueLocationColors, outline=bgColorBis)
+    canvas.create_rectangle(size - locationSize*6, 3, size, locationSize*6, fill=greenLocationColors, outline=bgColorBis)
+    canvas.create_rectangle(size - locationSize*6, size - locationSize*6, size, size, fill=yellowLocationColors, outline=bgColorBis)
     #endregion Draw players camps
 
     #region Draw main locations
