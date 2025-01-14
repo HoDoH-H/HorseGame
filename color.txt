@@ -1,0 +1,30 @@
+Dark Mod :
+
+GlobalbgColor = "gray0"
+bgColor = "gray18"
+bgColorBis = "gray5"
+
+redColor = "firebrick4"
+redLocationColors = "firebrick2"
+greenColor = "SpringGreen4"
+greenLocationColors = "SpringGreen2"
+yellowColor = "gold4"
+yellowLocationColors = "gold2"
+blueColor = "RoyalBlue4"
+blueLocationColors = "RoyalBlue2"
+
+
+Light Mod :
+
+GlobalbgColor = "gray100"
+bgColor = "gray75"
+bgColorBis = "gray90"
+
+redColor = "red4"
+redLocationColors = "red2"
+greenColor = "green4"
+greenLocationColors = "green2"
+yellowColor = "yellow4"
+yellowLocationColors = "yellow2"
+blueColor = "blue4"
+blueLocationColors = "blue2"

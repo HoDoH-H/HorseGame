@@ -7,27 +7,28 @@ from tkinter import *
 root = tk.Tk()
 
 #region Colors
-bgColor = "gray20"
-bgColorBis = "gray35"
+GlobalbgColor = "gray0"
+bgColor = "gray18"
+bgColorBis = "gray5"
 
-redColor = "red"
-redLocationColors = "red4"
-greenColor = "green"
-greenLocationColors = "green4"
-yellowColor = "yellow"
-yellowLocationColors = "goldenrod"
-blueColor = "blue"
-blueLocationColors = "blue4"
+redColor = "firebrick4"
+redLocationColors = "firebrick2"
+greenColor = "SpringGreen4"
+greenLocationColors = "SpringGreen2"
+yellowColor = "gold4"
+yellowLocationColors = "gold2"
+blueColor = "RoyalBlue4"
+blueLocationColors = "RoyalBlue2"
 #endregion Colors
 
 #region Main Page Setter
 
-size = 900
+size = 750
 locationSize = size/15
 borderSize = 5
 locationDisplaySize = locationSize-borderSize
 
-canvas = Canvas(root, width=size, height=size, background="gray35")
+canvas = Canvas(root, width=size, height=size, background=GlobalbgColor)
 canvas.pack()
 
 #endregion Main Page Setter
