@@ -3,8 +3,11 @@
 import logics
 import tkinter as tk
 from tkinter import *
+import random
 
 root = tk.Tk()
+turn = 0
+turnValue = 1
 
 #region Colors
 GlobalbgColor = "gray0"
@@ -23,10 +26,10 @@ blueLocationColors = "RoyalBlue2"
 
 #region Main Page Setter
 
-size = 750
-locationSize = size/15
-borderSize = 5
-locationDisplaySize = locationSize-borderSize
+size = logics.size
+locationSize = logics.locationSize
+borderSize = logics.borderSize
+locationDisplaySize = logics.locationDisplaySize
 
 canvas = Canvas(root, width=size, height=size, background=GlobalbgColor)
 canvas.pack()
@@ -40,7 +43,7 @@ def DrawBoard():
     Used to draw the board on the root windows inside a canvas
     """
     #region Draw players camps
-    canvas.create_rectangle(3, 3, locationSize*6, locationSize*6, fill=redLocationColors, outline=bgColorBis)
+    canvas.create_rectangle(3, 3, locationSize*6, locationSize*6, fill=redLocationColors, outline=bgColorBis, tags="RedCamp")
     canvas.create_rectangle(3, size, locationSize*6, size - locationSize*6, fill=blueLocationColors, outline=bgColorBis)
     canvas.create_rectangle(size - locationSize*6, 3, size, locationSize*6, fill=greenLocationColors, outline=bgColorBis)
     canvas.create_rectangle(size - locationSize*6, size - locationSize*6, size, size, fill=yellowLocationColors, outline=bgColorBis)
@@ -91,21 +94,94 @@ def DrawBoard():
     # Update Canvas
     canvas.pack()
 
+
+def CanvasClicked(event):
+    global x,y, turnValue, turn
+    x = event.x
+    y = event.y
+
+    print("Turn when clicked: ", turn)
+
+    #turnValue = random.randint(1, 6)
+    
+    # Check if current player click on a camp
+    if(x < locationSize*6 and y < locationSize*6 and turn == 0):
+        getHorseOutOfCamp(0)
+    elif(x > locationSize*9 and y < locationSize*6 and turn == 1):
+        getHorseOutOfCamp(1)
+    elif(x > locationSize*9 and y > locationSize*9 and turn == 2):
+        getHorseOutOfCamp(2)
+    elif(x < locationSize*6 and y > locationSize*9 and turn == 3):
+        getHorseOutOfCamp(3)
+    else: # Check if current player click on a location
+        TryMoveHorse()
+
 #endregion UI Method Related
 
-def getorigin(eventorigin):
-      global x,y
-      x = eventorigin.x
-      y = eventorigin.y
-      if(x < locationSize*6):
-          canvas.coords(horses[0][0].shape, locationSize * 0 + borderSize, locationSize * 7 + borderSize, locationSize * 0 + locationDisplaySize, locationSize * 7 + locationDisplaySize)
-          canvas.update()
-          
+def TryMoveHorse():
+    for h in range(4):
+        if(horses[turn][h].Finished == False and horses[turn][h].currentTileIndex != -1):
+            if(logics.locationsPos[horses[turn][h].currentTileIndex][0] * locationSize < x < (logics.locationsPos[horses[turn][h].currentTileIndex][0] + 1) * locationSize and logics.locationsPos[horses[turn][h].currentTileIndex][1] * locationSize < y < (logics.locationsPos[horses[turn][h].currentTileIndex][1] + 1) * locationSize):
+                notc = horses[turn][h].numberOfTileCrossed + turnValue - 56
+                ct = horses[turn][h].currentTileIndex + turnValue - 56
+                if(horses[turn][h].currentTileIndex >= 56): # If horse is in the ladder
+                    if(horses[turn][h].currentTileIndex + turnValue > logics.teamLadderStart[turn] + 6): # Can't move more than the size of the ladder
+                        return
+                    elif(horses[turn][h].currentTileIndex + turnValue == logics.teamLadderStart[turn] + 6): # Makes horse disapear if it reaches just the size of the ladder
+                        horses[turn][h].Finished, horses[turn][h].currentTileIndex = True, -2
+                        canvas.coords(horses[turn][h].shape, 0, 0, 0, 0)
+                    else: # Move the horse on the ladder
+                        if(checkIfTileEmpty(horses[turn][h].currentTileIndex + turnValue)):
+                            horses[turn][h].numberOfTileCrossed += turnValue
+                            moveHorse(horses[turn][h], horses[turn][h].currentTileIndex + turnValue)
+                elif(horses[turn][h].numberOfTileCrossed + turnValue >= 56): # If horse need to start climbing the ladder
+                    if(checkIfTileEmpty(logics.teamLadderStart[turn] + notc)):
+                        horses[turn][h].numberOfTileCrossed += turnValue
+                        moveHorse(horses[turn][h], logics.teamLadderStart[turn] + notc)
+                elif(horses[turn][h].currentTileIndex + turnValue >= 56): # If horse need to get to the first tile
+                    if(checkIfTileEmpty(ct)):
+                        horses[turn][h].numberOfTileCrossed += turnValue
+                        moveHorse(horses[turn][h], ct)
+                elif(checkIfTileEmpty(horses[turn][h].currentTileIndex + turnValue)): # If horse doesn't need anything special, just go
+                    horses[turn][h].numberOfTileCrossed += turnValue
+                    moveHorse(horses[turn][h], horses[turn][h].currentTileIndex + turnValue)
+
+def checkIfTileEmpty(tile):
+    for t in range(4):
+        for h in range(4):
+            if(horses[t][h].currentTileIndex == tile):
+                if(turn == t): # If there's a horse of the same team
+                    return False
+                else: # If there's a horse from another team
+                    # TODO - Make enemy horse get back to its camp
+                    return True
+    return True
+
+def getHorseOutOfCamp(teamId):
+    if(checkIfTileEmpty(logics.teamSpawns[teamId])):
+        for i in range(4):
+            if(horses[teamId][i].currentTileIndex == -1):
+                moveHorse(horses[teamId][i], logics.teamSpawns[teamId])
+                horses[teamId][i].numberOfTileCrossed = 0
+                return
+            
+def getHorseBackToCamp(horse : logics.Horse):
+    horse.currentTileIndex, horse.numberOfTileCrossed = 0, 0
+    
+                
+
+def moveHorse(horse : logics.Horse, location, passTurn = True):
+    global turn
+
+    horse.currentTileIndex = location
+    canvas.coords(horse.shape, locationSize * logics.locationsPos[location][0] + borderSize, locationSize * logics.locationsPos[location][1] + borderSize, locationSize * logics.locationsPos[location][0] + locationDisplaySize, locationSize * logics.locationsPos[location][1] + locationDisplaySize)
+    if(passTurn):
+        turn = logics.RunTurns(turn, horses)
 
 isRunning = True
 
 DrawBoard()
-root.bind("<Button 1>",getorigin)
+canvas.bind("<Button 1>",CanvasClicked)
 
 horses = [[logics.Horse(0, canvas.create_oval(locationSize * logics.playerCampsPos[0][0][0] + borderSize, locationSize * logics.playerCampsPos[0][0][1] + borderSize, locationSize * logics.playerCampsPos[0][0][0] + locationDisplaySize, locationSize * logics.playerCampsPos[0][0][1] + locationDisplaySize, fill=redColor, outline=bgColorBis)), 
            logics.Horse(0, canvas.create_oval(locationSize * logics.playerCampsPos[0][1][0] + borderSize, locationSize * logics.playerCampsPos[0][1][1] + borderSize, locationSize * logics.playerCampsPos[0][1][0] + locationDisplaySize, locationSize * logics.playerCampsPos[0][1][1] + locationDisplaySize, fill=redColor, outline=bgColorBis)), 

@@ -2,12 +2,20 @@
 Only for logics
 """
 
+size = 750
+locationSize = size/15
+borderSize = size/150
+locationDisplaySize = locationSize-borderSize
+
+campsPos = [locationSize*6, locationSize*6]
 playerCampsPos = [[[0, 5], [1, 5], [2, 5], [3, 5]], #Red
                   [[9, 0], [9, 1], [9, 2], [9, 3]], #Green
                   [[14, 9], [13, 9], [12, 9], [11, 9]], #Yellow
                   [[5, 14], [5, 13], [5, 12], [5, 11]]] #Blue
 
-playerSpawns = [0, 14, 28, 42]
+teamSpawns = [0, 14, 28, 42]
+teamLadderStart = [56, 62, 68, 74]
+
 
 locationsPos = [[0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6],
                 [6, 6], 
@@ -39,8 +47,8 @@ def RunTurns(currentTurn, teams):
         newTurn = 0
     else:
         newTurn += 1
-    for h in range(5):
-        if (teams[newTurn][h].Finished != False):
+    for h in range(4):
+        if (not teams[newTurn][h].Finished):
             return newTurn
         if(newTurn == currentTurn): return currentTurn
         else:
