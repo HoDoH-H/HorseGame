@@ -8,6 +8,8 @@ import random
 root = tk.Tk()
 turn = 0
 turnValue = 1
+canPlay = False
+canThrow = True
 
 #region Colors
 GlobalbgColor = "gray0"
@@ -31,12 +33,40 @@ locationSize = logics.locationSize
 borderSize = logics.borderSize
 locationDisplaySize = logics.locationDisplaySize
 
+diceSize = size/9
+dotSize = diceSize/5
+
 canvas = Canvas(root, width=size, height=size, background=GlobalbgColor)
-canvas.pack()
+diceCanvas = Canvas(root, width=diceSize, height=diceSize, background='gray50')
+
+dots = [diceCanvas.create_oval(0, 0, 0, 0, fill="black"),
+        diceCanvas.create_oval(0, 0, 0, 0, fill="black"),
+        diceCanvas.create_oval(0, 0, 0, 0, fill="black"),
+        diceCanvas.create_oval(0, 0, 0, 0, fill="black"),
+        diceCanvas.create_oval(0, 0, 0, 0, fill="black"),
+        diceCanvas.create_oval(0, 0, 0, 0, fill="black"),
+        diceCanvas.create_oval(0, 0, 0, 0, fill="black")]
 
 #endregion Main Page Setter
 
 #region UI Method Related
+
+def SetDiceUI(value):
+    print(value)
+    for dot in dots:
+        diceCanvas.coords(dot, 0, 0, 0, 0)
+    if(0 < value <= 6):
+        if(value == 1 or value == 3 or value == 5):
+            diceCanvas.coords(dots[3], diceSize/2-dotSize/2, diceSize/2-dotSize/2, diceSize/2+dotSize/2, diceSize/2+dotSize/2)
+        if(value == 2 or value == 3 or value == 4 or value == 5 or value == 6):
+            diceCanvas.coords(dots[5], diceSize/4-dotSize/2, diceSize/4*3-dotSize/2, diceSize/4+dotSize/2, diceSize/4*3+dotSize/2)
+            diceCanvas.coords(dots[1], diceSize/4*3-dotSize/2, diceSize/4-dotSize/2, diceSize/4*3+dotSize/2, diceSize/4+dotSize/2)
+        if(value == value == 4 or value == 5 or value == 6):
+            diceCanvas.coords(dots[0], diceSize/4-dotSize/2, diceSize/4-dotSize/2, diceSize/4+dotSize/2, diceSize/4+dotSize/2)
+            diceCanvas.coords(dots[6], diceSize/4*3-dotSize/2, diceSize/4*3-dotSize/2, diceSize/4*3+dotSize/2, diceSize/4*3+dotSize/2)
+        if(value == value == 6):
+            diceCanvas.coords(dots[2], diceSize/4-dotSize/2, diceSize/2-dotSize/2, diceSize/4+dotSize/2, diceSize/2+dotSize/2)
+            diceCanvas.coords(dots[4], diceSize/4*3-dotSize/2, diceSize/2-dotSize/2, diceSize/4*3+dotSize/2, diceSize/2+dotSize/2)
 
 def DrawBoard():
     """
@@ -96,11 +126,10 @@ def DrawBoard():
 
 
 def CanvasClicked(event):
+    if (not canPlay): return
     global x,y, turnValue, turn
     x = event.x
     y = event.y
-
-    print("Turn when clicked: ", turn)
 
     #turnValue = random.randint(1, 6)
     
@@ -115,9 +144,20 @@ def CanvasClicked(event):
         getHorseOutOfCamp(3)
     else: # Check if current player click on a location
         TryMoveHorse()
+canvas.bind("<Button 1>",CanvasClicked)
+
+def throwDice():
+    global turnValue, canPlay, canThrow
+    if(canThrow):
+        canThrow = False
+        turnValue = random.randint(1, 6)
+        SetDiceUI(turnValue)
+        canPlay = True
+diceButton = Button(root, text="Throw dice!", command=throwDice)
 
 #endregion UI Method Related
 
+#region Game Logics Methods
 def TryMoveHorse():
     for h in range(4):
         if(horses[turn][h].Finished == False and horses[turn][h].currentTileIndex != -1):
@@ -154,6 +194,7 @@ def checkIfTileEmpty(tile):
                     return False
                 else: # If there's a horse from another team
                     # TODO - Make enemy horse get back to its camp
+                    getHorseBackToCamp(horses[t][h])
                     return True
     return True
 
@@ -166,22 +207,26 @@ def getHorseOutOfCamp(teamId):
                 return
             
 def getHorseBackToCamp(horse : logics.Horse):
-    horse.currentTileIndex, horse.numberOfTileCrossed = 0, 0
-    
+    horse.currentTileIndex, horse.numberOfTileCrossed = -1, 0
+    for h in range(4):
+        if(horses[horse.teamId][h] is horse):
+            canvas.coords(horse.shape, locationSize * logics.playerCampsPos[horse.teamId][h][0] + borderSize, locationSize * logics.playerCampsPos[horse.teamId][h][1] + borderSize, locationSize * logics.playerCampsPos[horse.teamId][h][0] + locationDisplaySize, locationSize * logics.playerCampsPos[horse.teamId][h][1] + locationDisplaySize)
                 
 
 def moveHorse(horse : logics.Horse, location, passTurn = True):
-    global turn
+    global turn, canPlay, canThrow
 
     horse.currentTileIndex = location
     canvas.coords(horse.shape, locationSize * logics.locationsPos[location][0] + borderSize, locationSize * logics.locationsPos[location][1] + borderSize, locationSize * logics.locationsPos[location][0] + locationDisplaySize, locationSize * logics.locationsPos[location][1] + locationDisplaySize)
     if(passTurn):
-        turn = logics.RunTurns(turn, horses)
+        canPlay = False
+        canThrow = True
+        if(turnValue != 6):
+            turn = logics.RunTurns(turn, horses)
+#endregion Game Logics Methods
 
 isRunning = True
-
 DrawBoard()
-canvas.bind("<Button 1>",CanvasClicked)
 
 horses = [[logics.Horse(0, canvas.create_oval(locationSize * logics.playerCampsPos[0][0][0] + borderSize, locationSize * logics.playerCampsPos[0][0][1] + borderSize, locationSize * logics.playerCampsPos[0][0][0] + locationDisplaySize, locationSize * logics.playerCampsPos[0][0][1] + locationDisplaySize, fill=redColor, outline=bgColorBis)), 
            logics.Horse(0, canvas.create_oval(locationSize * logics.playerCampsPos[0][1][0] + borderSize, locationSize * logics.playerCampsPos[0][1][1] + borderSize, locationSize * logics.playerCampsPos[0][1][0] + locationDisplaySize, locationSize * logics.playerCampsPos[0][1][1] + locationDisplaySize, fill=redColor, outline=bgColorBis)), 
@@ -203,6 +248,13 @@ horses = [[logics.Horse(0, canvas.create_oval(locationSize * logics.playerCampsP
            logics.Horse(3, canvas.create_oval(locationSize * logics.playerCampsPos[3][2][0] + borderSize, locationSize * logics.playerCampsPos[3][2][1] + borderSize, locationSize * logics.playerCampsPos[3][2][0] + locationDisplaySize, locationSize * logics.playerCampsPos[3][2][1] + locationDisplaySize, fill=blueColor, outline=bgColorBis)), 
            logics.Horse(3, canvas.create_oval(locationSize * logics.playerCampsPos[3][3][0] + borderSize, locationSize * logics.playerCampsPos[3][3][1] + borderSize, locationSize * logics.playerCampsPos[3][3][0] + locationDisplaySize, locationSize * logics.playerCampsPos[3][3][1] + locationDisplaySize, fill=blueColor, outline=bgColorBis))]] #Blue team
 
+for i in range(2, 4):
+    for e in horses[i]:
+        e.Finished = True
 
 
+
+canvas.pack(side="left")
+diceCanvas.pack()
+diceButton.pack()
 root.mainloop()

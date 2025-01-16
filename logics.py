@@ -7,7 +7,6 @@ locationSize = size/15
 borderSize = size/150
 locationDisplaySize = locationSize-borderSize
 
-campsPos = [locationSize*6, locationSize*6]
 playerCampsPos = [[[0, 5], [1, 5], [2, 5], [3, 5]], #Red
                   [[9, 0], [9, 1], [9, 2], [9, 3]], #Green
                   [[14, 9], [13, 9], [12, 9], [11, 9]], #Yellow
@@ -15,6 +14,7 @@ playerCampsPos = [[[0, 5], [1, 5], [2, 5], [3, 5]], #Red
 
 teamSpawns = [0, 14, 28, 42]
 teamLadderStart = [56, 62, 68, 74]
+teamNames = ["Red", "Green", "Yellow", "Blue"]
 
 
 locationsPos = [[0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6],
@@ -62,7 +62,7 @@ def RunTurns(currentTurn, teams):
             
 
 class Horse:
-    def __init__(self, teamId, shape):
+    def __init__(self, teamId : int, shape):
         self.teamId = teamId
         self.shape = shape
         self.numberOfTileCrossed = 0
