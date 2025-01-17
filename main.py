@@ -148,16 +148,28 @@ def CanvasClicked(event):
 canvas.bind("<Button 1>",CanvasClicked)
 
 def throwDice():
-    global turnValue, canPlay, canThrow
+    global turnValue, canPlay, canThrow, turn
     if(canThrow):
         turnValue = random.randint(1, 6)
         SetDiceUI(turnValue)
         if (not alreadyOut() and turnValue != 6):
-            logics.RunTurns(turn, horses)
+            turn = logics.RunTurns(turn, horses)
+            changeDiceColor()
             return
         canThrow = False
         canPlay = True
 diceButton = Button(root, text="Throw dice!", command=throwDice)
+
+def changeDiceColor():
+    if (turn == 0):
+        diceButton.configure(background=redColor, activebackground="#33B5E5")
+    elif (turn == 1):
+        diceButton.configure(background=greenColor, activebackground="#33B5E5")
+    elif (turn == 2):
+        diceButton.configure(background=yellowColor, activebackground="#33B5E5")
+    elif (turn == 3):
+        diceButton.configure(background=blueColor, activebackground="#33B5E5")
+
 
 #endregion UI Method Related
 
@@ -227,6 +239,7 @@ def moveHorse(horse : logics.Horse, location, passTurn = True):
         canThrow = True
         if(turnValue != 6):
             turn = logics.RunTurns(turn, horses)
+            changeDiceColor()
 #endregion Game Logics Methods
 
 isRunning = True
@@ -280,7 +293,6 @@ def alreadyOut():
 canvas.pack(side="left")
 diceCanvas.pack()
 diceButton.pack()
-
+changeDiceColor()
 setTeams(nTeams)
-
 root.mainloop()
