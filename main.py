@@ -150,10 +150,12 @@ canvas.bind("<Button 1>",CanvasClicked)
 def throwDice():
     global turnValue, canPlay, canThrow
     if(canThrow):
-        
-        canThrow = False
         turnValue = random.randint(1, 6)
         SetDiceUI(turnValue)
+        if (not alreadyOut() and turnValue != 6):
+            logics.RunTurns(turn, horses)
+            return
+        canThrow = False
         canPlay = True
 diceButton = Button(root, text="Throw dice!", command=throwDice)
 
@@ -269,7 +271,11 @@ def setTeams(nPlayers : int):
         else:
             horses[3][i].Finished = True
 
-
+def alreadyOut():
+    for i in range(4):
+        if (horses[turn][i].Finished == False and horses[turn][i].currentTileIndex != -1):
+            return True
+    return False
 
 canvas.pack(side="left")
 diceCanvas.pack()
