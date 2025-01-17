@@ -10,6 +10,7 @@ turn = 0
 turnValue = 1
 canPlay = False
 canThrow = True
+nTeams = 2
 
 #region Colors
 GlobalbgColor = "gray0"
@@ -149,6 +150,7 @@ canvas.bind("<Button 1>",CanvasClicked)
 def throwDice():
     global turnValue, canPlay, canThrow
     if(canThrow):
+        
         canThrow = False
         turnValue = random.randint(1, 6)
         SetDiceUI(turnValue)
@@ -248,13 +250,31 @@ horses = [[logics.Horse(0, canvas.create_oval(locationSize * logics.playerCampsP
            logics.Horse(3, canvas.create_oval(locationSize * logics.playerCampsPos[3][2][0] + borderSize, locationSize * logics.playerCampsPos[3][2][1] + borderSize, locationSize * logics.playerCampsPos[3][2][0] + locationDisplaySize, locationSize * logics.playerCampsPos[3][2][1] + locationDisplaySize, fill=blueColor, outline=bgColorBis)), 
            logics.Horse(3, canvas.create_oval(locationSize * logics.playerCampsPos[3][3][0] + borderSize, locationSize * logics.playerCampsPos[3][3][1] + borderSize, locationSize * logics.playerCampsPos[3][3][0] + locationDisplaySize, locationSize * logics.playerCampsPos[3][3][1] + locationDisplaySize, fill=blueColor, outline=bgColorBis))]] #Blue team
 
-for i in range(2, 4):
-    for e in horses[i]:
-        e.Finished = True
+def setTeams(nPlayers : int):
+    """
+    1 < nPlayer < 5
+    """
+    global horses
+    for i in range(4):
+        if(nPlayers >= 2):
+            horses[0][i].Finished = False
+            horses[2][i].Finished = False
+        if(nPlayers >= 3):
+            horses[1][i].Finished = False
+        else:
+            horses[1][i].Finished = True
+            horses[3][i].Finished = True
+        if(nPlayers >= 4):
+            horses[3][i].Finished = False
+        else:
+            horses[3][i].Finished = True
 
 
 
 canvas.pack(side="left")
 diceCanvas.pack()
 diceButton.pack()
+
+setTeams(nTeams)
+
 root.mainloop()
