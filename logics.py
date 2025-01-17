@@ -56,7 +56,7 @@ def RunTurns(currentTurn, teams):
                 newTurn = 0
             else:
                 newTurn += 1
-    return False
+    return -1
     
         
             
