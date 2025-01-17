@@ -53,7 +53,6 @@ dots = [diceCanvas.create_oval(0, 0, 0, 0, fill="black"),
 #region UI Method Related
 
 def SetDiceUI(value):
-    print(value)
     for dot in dots:
         diceCanvas.coords(dot, 0, 0, 0, 0)
     if(0 < value <= 6):
@@ -131,8 +130,6 @@ def CanvasClicked(event):
     global x,y, turnValue, turn
     x = event.x
     y = event.y
-
-    #turnValue = random.randint(1, 6)
     
     # Check if current player click on a camp
     if(x < locationSize*6 and y < locationSize*6 and turn == 0):
@@ -151,16 +148,27 @@ def throwDice():
     global turnValue, canPlay, canThrow, turn
     if(canThrow):
         turnValue = random.randint(1, 6)
+
+        # Dice Animation
+        for i in range(random.randint(5, 15)):
+            root.after(75)
+            SetDiceUI(random.randint(1, 6))
+            root.update()
+
         SetDiceUI(turnValue)
+        root.update()
         if (not alreadyOut() and turnValue != 6):
             turn = logics.RunTurns(turn, horses)
-            changeDiceColor()
+            changeDiceButtonColor()
+            root.after(500)
+            SetDiceUI(0)
+            root.update()
             return
         canThrow = False
         canPlay = True
 diceButton = Button(root, text="Throw dice!", command=throwDice)
 
-def changeDiceColor():
+def changeDiceButtonColor():
     if (turn == 0):
         diceButton.configure(background=redLocationColors, activebackground=redColor)
     elif (turn == 1):
@@ -175,6 +183,7 @@ def changeDiceColor():
 
 #region Game Logics Methods
 def TryMoveHorse():
+    global canPlay, canThrow, turn
     for h in range(4):
         if(horses[turn][h].Finished == False and horses[turn][h].currentTileIndex != -1):
             if(logics.locationsPos[horses[turn][h].currentTileIndex][0] * locationSize < x < (logics.locationsPos[horses[turn][h].currentTileIndex][0] + 1) * locationSize and logics.locationsPos[horses[turn][h].currentTileIndex][1] * locationSize < y < (logics.locationsPos[horses[turn][h].currentTileIndex][1] + 1) * locationSize):
@@ -182,10 +191,16 @@ def TryMoveHorse():
                 ct = horses[turn][h].currentTileIndex + turnValue - 56
                 if(horses[turn][h].currentTileIndex >= 56): # If horse is in the ladder
                     if(horses[turn][h].currentTileIndex + turnValue > logics.teamLadderStart[turn] + 6): # Can't move more than the size of the ladder
-                        return
+                        return False
                     elif(horses[turn][h].currentTileIndex + turnValue == logics.teamLadderStart[turn] + 6): # Makes horse disapear if it reaches just the size of the ladder
                         horses[turn][h].Finished, horses[turn][h].currentTileIndex = True, -2
                         canvas.coords(horses[turn][h].shape, 0, 0, 0, 0)
+                        canPlay = False
+                        canThrow = True
+                        if(turnValue != 6):
+                            turn = logics.RunTurns(turn, horses)
+                            changeDiceButtonColor()
+                            SetDiceUI(0)
                     else: # Move the horse on the ladder
                         if(checkIfTileEmpty(horses[turn][h].currentTileIndex + turnValue)):
                             horses[turn][h].numberOfTileCrossed += turnValue
@@ -201,6 +216,7 @@ def TryMoveHorse():
                 elif(checkIfTileEmpty(horses[turn][h].currentTileIndex + turnValue)): # If horse doesn't need anything special, just go
                     horses[turn][h].numberOfTileCrossed += turnValue
                     moveHorse(horses[turn][h], horses[turn][h].currentTileIndex + turnValue)
+    return True
 
 def checkIfTileEmpty(tile):
     for t in range(4):
@@ -239,7 +255,8 @@ def moveHorse(horse : logics.Horse, location, passTurn = True):
         canThrow = True
         if(turnValue != 6):
             turn = logics.RunTurns(turn, horses)
-            changeDiceColor()
+            changeDiceButtonColor()
+    SetDiceUI(0)
 #endregion Game Logics Methods
 
 isRunning = True
@@ -285,6 +302,9 @@ def setTeams(nPlayers : int):
             horses[3][i].Finished = True
 
 def alreadyOut():
+    # TODO - If there's one or multiple horse(s) out of camp, check if it can perform a move,
+    # Example: If a horse is on the ladder and the dice return a number higher than the numbers of tiles the horse has to travel through to finish
+    # Then pass the team turn to the next one.
     for i in range(4):
         if (horses[turn][i].Finished == False and horses[turn][i].currentTileIndex != -1):
             return True
@@ -293,6 +313,6 @@ def alreadyOut():
 canvas.pack(side="left")
 diceCanvas.pack()
 diceButton.pack()
-changeDiceColor()
+changeDiceButtonColor()
 setTeams(nTeams)
 root.mainloop()
