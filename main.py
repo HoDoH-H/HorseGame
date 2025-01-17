@@ -162,13 +162,13 @@ diceButton = Button(root, text="Throw dice!", command=throwDice)
 
 def changeDiceColor():
     if (turn == 0):
-        diceButton.configure(background=redColor, activebackground="#33B5E5")
+        diceButton.configure(background=redLocationColors, activebackground=redColor)
     elif (turn == 1):
-        diceButton.configure(background=greenColor, activebackground="#33B5E5")
+        diceButton.configure(background=greenLocationColors, activebackground=greenColor)
     elif (turn == 2):
-        diceButton.configure(background=yellowColor, activebackground="#33B5E5")
+        diceButton.configure(background=yellowLocationColors, activebackground=yellowColor)
     elif (turn == 3):
-        diceButton.configure(background=blueColor, activebackground="#33B5E5")
+        diceButton.configure(background=blueLocationColors, activebackground=blueColor)
 
 
 #endregion UI Method Related
