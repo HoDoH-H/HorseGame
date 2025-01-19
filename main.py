@@ -147,7 +147,7 @@ canvas.bind("<Button 1>",CanvasClicked)
 def throwDice():
     global turnValue, canPlay, canThrow, turn
     if(canThrow):
-        turnValue = random.randint(1, 6)
+        turnValue = random.randint(1,6)
 
         # Dice Animation
         for i in range(random.randint(5, 15)):
@@ -302,9 +302,6 @@ def setTeams(nPlayers : int):
             horses[3][i].Finished = True
 
 def alreadyOut():
-    # TODO - If there's one or multiple horse(s) out of camp, check if it can perform a move,
-    # Example: If a horse is on the ladder and the dice return a number higher than the numbers of tiles the horse has to travel through to finish
-    # Then pass the team turn to the next one.
     for i in range(4):
         if (horses[turn][i].Finished == False and horses[turn][i].currentTileIndex != -1):
             return True
